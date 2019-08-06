@@ -13,11 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Singleton;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.stream.Collectors.*;
 import static java.util.Map.Entry.*;
 
+@Singleton
 @Component
 public class MusicFestivalCache {
 
@@ -28,6 +31,10 @@ public class MusicFestivalCache {
 
     private Cache<String, RecordLabel> recordLabelCache;
 
+    private LocalDateTime cachePopulationTimestamp;
+
+    private static final Integer TIME_TO_LIVE_IN_HOURS = 24;
+
     @PostConstruct
     public void initCache() {
         recordLabelCache = CacheBuilder.newBuilder().build();
@@ -35,7 +42,7 @@ public class MusicFestivalCache {
 
     public List<RecordLabel> getAllMusicFestivals() throws ResponseParsingException {
         // Initialize cache if empty
-        if(recordLabelCache.asMap() == null || recordLabelCache.asMap().isEmpty()) {
+        if(isCacheEmptyOrStale()) {
             populateCache();
         }
 
@@ -57,6 +64,23 @@ public class MusicFestivalCache {
 
         // Prepare cache and populate with restructured festival data
         recordLabelCache.putAll(restructureFestivalData(festivals));
+
+        cachePopulationTimestamp = LocalDateTime.now();
+    }
+
+    private boolean isCacheEmptyOrStale() {
+        // Return true for cache is empty
+        if(recordLabelCache.asMap() == null || recordLabelCache.asMap().isEmpty()) {
+            return true;
+        }
+
+        // Return true for cache is stale
+        LocalDateTime now = LocalDateTime.now();
+        if(now.minusHours(TIME_TO_LIVE_IN_HOURS).isAfter(cachePopulationTimestamp)) {
+            return true;
+        }
+
+        return false;
     }
 
     private Map<String, RecordLabel> restructureFestivalData(List<Festival> festivals) {
