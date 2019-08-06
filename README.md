@@ -18,7 +18,7 @@ The data is provided to you via an API by another team; they assure you all the 
 Use this API as is to output the format specified above in any medium you desire; let it be a website, terminal, file or morse code if that's what you want to do - we just want to see the result somehow.
 
 ## Frameworks Used
-- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Spring Boot](https://spring.io/projects/spring-boot) with Jersey
 
 ## Solution
 This solution is implemented as a Spring Boot application that calls the REST API, restructures the festival data as per the given format and writes the result to a text file.
