@@ -10,12 +10,20 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service layer implementation for music festival application.
+ */
 @Service
 public class MusicFestivalServiceImpl implements MusicFestivalService {
 
     @Autowired
     private MusicFestivalCache musicFestivalCache;
 
+    /**
+     * Get a list of record labels with band and festival data.
+     * @return a list of {@link RecordLabel}s
+     * @throws ResponseParsingException
+     */
     @Override
     public List<RecordLabel> getAllFestivals() throws ResponseParsingException {
         List<RecordLabel> returnList = new ArrayList<>();

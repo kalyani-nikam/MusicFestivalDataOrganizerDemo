@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.Map;
 
+/**
+ * Model class to represent a band. Contains a list of festivals attended.
+ */
 @Getter @Setter @RequiredArgsConstructor
 public class Band {
 

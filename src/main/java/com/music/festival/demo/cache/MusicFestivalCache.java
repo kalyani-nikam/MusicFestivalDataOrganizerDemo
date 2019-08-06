@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Singleton;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -118,7 +116,7 @@ public class MusicFestivalCache {
     }
 
     /**
-     * Restructure the data.
+     * Restructures the festivals data.
      * @param festivals
      * @return Map of {@link RecordLabel}s by name
      */
@@ -143,7 +141,7 @@ public class MusicFestivalCache {
                             com.music.festival.demo.model.Band recordLabelBand = createOrGetBandByNameFromRecordLabel(bandName, recordLabel);
 
                             // Get festivals by the band and record label, create map if not already present
-                            Map<String, com.music.festival.demo.model.Festival> festivalsByBand = createOrGetetFestivalsByBand(recordLabelBand);
+                            Map<String, com.music.festival.demo.model.Festival> festivalsByBand = createOrGetFestivalsByBand(recordLabelBand);
 
                             // Add festival to the band with bandName under the record label with recordLabelName
                             festivalsByBand.put(festivalName, new com.music.festival.demo.model.Festival(festivalName));
@@ -168,6 +166,11 @@ public class MusicFestivalCache {
         return recordLabelsMap;
     }
 
+    /**
+     * Sorts festivals under this band in alphabetically ascending order by festival name
+     * @param band
+     * @return
+     */
     private LinkedHashMap<String, com.music.festival.demo.model.Festival> getSortedFestivals(com.music.festival.demo.model.Band band) {
         return band.getFestivals()
                 .entrySet()
@@ -177,6 +180,11 @@ public class MusicFestivalCache {
                         (e1, e2) -> e2, LinkedHashMap::new));
     }
 
+    /**
+     * Sorts bands under this record label in alphabetically ascending order by band name
+     * @param recordLabel
+     * @return
+     */
     private LinkedHashMap<String, com.music.festival.demo.model.Band> getSorterBands(RecordLabel recordLabel) {
         return recordLabel.getBands()
                 .entrySet()
@@ -186,6 +194,11 @@ public class MusicFestivalCache {
                         (e1, e2) -> e2, LinkedHashMap::new));
     }
 
+    /**
+     * Sorts record labels in alphabetically ascending order by record label name
+     * @param recordLabelsMap
+     * @return
+     */
     private LinkedHashMap<String, RecordLabel> getSorterRecordLabels(Map<String, RecordLabel> recordLabelsMap) {
         return recordLabelsMap.entrySet()
                 .stream()
@@ -194,6 +207,12 @@ public class MusicFestivalCache {
                         (e1, e2) -> e2, LinkedHashMap::new));
     }
 
+    /**
+     * Returns a record label from the given map. Creates a new map entry if it does not exist.
+     * @param recordLabelsMap
+     * @param recordLabelName
+     * @return
+     */
     private RecordLabel createOrGetRecordLabelFromMap(Map<String, RecordLabel> recordLabelsMap, String recordLabelName) {
         RecordLabel recordLabel = new RecordLabel(recordLabelName);
         if(recordLabelsMap.containsKey(recordLabelName)) {
@@ -205,7 +224,12 @@ public class MusicFestivalCache {
         return recordLabel;
     }
 
-    private Map<String, com.music.festival.demo.model.Festival> createOrGetetFestivalsByBand(com.music.festival.demo.model.Band recordLabelBand) {
+    /**
+     * Returns festivals under this band. Creates new map if it does not exist.
+     * @param recordLabelBand
+     * @return
+     */
+    private Map<String, com.music.festival.demo.model.Festival> createOrGetFestivalsByBand(com.music.festival.demo.model.Band recordLabelBand) {
         Map<String, com.music.festival.demo.model.Festival> festivalsByBand = recordLabelBand.getFestivals();
         if(festivalsByBand == null) {
             festivalsByBand = new HashMap<String, com.music.festival.demo.model.Festival>();
@@ -214,6 +238,12 @@ public class MusicFestivalCache {
         return festivalsByBand;
     }
 
+    /**
+     * Returns band by given band name from the record label. Creates one if it does not exist.
+     * @param bandName
+     * @param recordLabel
+     * @return
+     */
     private com.music.festival.demo.model.Band createOrGetBandByNameFromRecordLabel(String bandName, RecordLabel recordLabel) {
         Map<String, com.music.festival.demo.model.Band> recordLabelBands = recordLabel.getBands();
         if(recordLabelBands == null) {

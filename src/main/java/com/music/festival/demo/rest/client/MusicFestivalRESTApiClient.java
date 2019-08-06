@@ -67,9 +67,10 @@ public class MusicFestivalRESTApiClient {
     }
 
     /**
-     *
+     * Invokes the remote REST API on the given path.
+     * Implements exponential backoff to deal with unsuccessful responses.
      * @param path
-     * @return
+     * @return Response received from the API
      */
     private Response invokeRemoteGetWithExponentialBackoff(final String path) {
         Client client = ClientBuilder.newClient( new ClientConfig() );

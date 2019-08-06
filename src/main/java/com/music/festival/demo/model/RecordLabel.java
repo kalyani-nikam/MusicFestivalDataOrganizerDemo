@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.Map;
 
+/**
+ * Model class that represents a record label. Contains bands under their management.
+ */
 @Getter @Setter @RequiredArgsConstructor
 public class RecordLabel {
 
