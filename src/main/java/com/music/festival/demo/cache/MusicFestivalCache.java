@@ -17,29 +17,54 @@ import javax.inject.Singleton;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static java.util.stream.Collectors.*;
-import static java.util.Map.Entry.*;
+import static java.util.Map.Entry.comparingByKey;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
-@Singleton
+/**
+ * Singleton class that acts as cache for festival data.
+ * The first invocation of getAllMusicFestivals() triggers REST API call to get festival data.
+ * The data is cached for 24 hours after which it becomes stale.
+ * Cache is reloaded on subsequent call to getAllMusicFestivals() after TTL has expired.
+ */
 @Component
 public class MusicFestivalCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MusicFestivalCache.class);
+
+    private static MusicFestivalCache cache = new MusicFestivalCache();
 
     @Autowired
     private MusicFestivalRESTApiClient apiClient;
 
     private Cache<String, RecordLabel> recordLabelCache;
 
+    /**
+     * Population time and time to live is required to keep track of stale cache
+     */
     private LocalDateTime cachePopulationTimestamp;
-
     private static final Integer TIME_TO_LIVE_IN_HOURS = 24;
 
-    @PostConstruct
-    public void initCache() {
+    /**
+     * Private constructor for the singleton class.
+     */
+    private MusicFestivalCache() {
         recordLabelCache = CacheBuilder.newBuilder().build();
     }
 
+    /**
+     * Returns instance of MusicFestivalCache
+     * @return instance of MusicFestivalCache
+     */
+    public static MusicFestivalCache getInstance() {
+        return cache;
+    }
+
+    /**
+     * Get restructured festival data
+     * @return List of {@link RecordLabel}s
+     * @throws ResponseParsingException when response string from REST API cannot be parsed
+     */
     public List<RecordLabel> getAllMusicFestivals() throws ResponseParsingException {
         // Initialize cache if empty
         if(isCacheEmptyOrStale()) {
@@ -57,6 +82,11 @@ public class MusicFestivalCache {
         return recordLabelsList;
     }
 
+    /**
+     * Invoke REST API to get festivals data.
+     * Then, restructure the data and populate cache.
+     * @throws ResponseParsingException
+     */
     private void populateCache() throws ResponseParsingException {
         // API call to get festivals data
         List<Festival> festivals = apiClient.getFestivals();
@@ -68,6 +98,10 @@ public class MusicFestivalCache {
         cachePopulationTimestamp = LocalDateTime.now();
     }
 
+    /**
+     * True  if cache is empty or stale.
+     * @return
+     */
     private boolean isCacheEmptyOrStale() {
         // Return true for cache is empty
         if(recordLabelCache.asMap() == null || recordLabelCache.asMap().isEmpty()) {
@@ -83,6 +117,11 @@ public class MusicFestivalCache {
         return false;
     }
 
+    /**
+     * Restructure the data.
+     * @param festivals
+     * @return Map of {@link RecordLabel}s by name
+     */
     private Map<String, RecordLabel> restructureFestivalData(List<Festival> festivals) {
         LOGGER.debug("Restructuring music festivals data.");
         final Map<String, RecordLabel> recordLabelsMap = new HashMap<String, RecordLabel>();

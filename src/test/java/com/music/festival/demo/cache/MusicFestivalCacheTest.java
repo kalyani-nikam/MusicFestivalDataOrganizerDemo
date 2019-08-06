@@ -35,7 +35,7 @@ public class MusicFestivalCacheTest {
     MusicFestivalRESTApiClient mockApiClient;
 
     @InjectMocks
-    MusicFestivalCache cache = new MusicFestivalCache();
+    MusicFestivalCache cache = MusicFestivalCache.getInstance();
 
     @Before
     public void setUp() {
@@ -48,7 +48,6 @@ public class MusicFestivalCacheTest {
 
         ArgumentCaptor<Map<String, RecordLabel>> captor = ArgumentCaptor.forClass(Map.class);
 
-        cache.initCache();
         List<RecordLabel> actualSortedRecordLabelList = cache.getAllMusicFestivals();
 
         // Verify interaction with the api client
