@@ -18,7 +18,7 @@
         <java.version>1.8</java.version>
         <lombok.version>1.18.4</lombok.version>
         <guava.version>28.0-jre</guava.version>
-        <jackson-databind.version>2.9.9.2</jackson-databind.version>
+        <jackson-databind.version>2.13.4.1</jackson-databind.version>
         <powermock-module-junit4.version>2.0.2</powermock-module-junit4.version>
     </properties>
 
